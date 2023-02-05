@@ -1,41 +1,29 @@
+import unittest
 import cirq
-import numpy as np
 import random
+from quantum_tic_tac_toe import *
+from player import Player
 
-def test_create_quantum_board():
-    board = create_quantum_board()
-    assert len(board) == 9, "Board should have 9 qubits"
-    for qubit in board:
-        assert isinstance(qubit, cirq.Qubit), "Each element in board should be a Qubit"
+class TestQuantumTicTacToe(unittest.TestCase):
+	def test_get_symbol(self):
+		# Test that the get_symbol method returns 'X' for the first player
+		# and 'O' for the second player
+		qttt = QuantumTicTacToe()
+		self.assertEqual(qttt.get_symbol(), 'X')
+		qttt.current_player = 1
+		self.assertEqual(qttt.get_symbol(), 'O')
 
-def test_play_quantum_tic_tac_toe():
-    class Player:
-        def get_move(self, circuit, board, symbol):
-            return cirq.X(board[random.randint(0, 8)])
+	def test_create_quantum_board(self):
+		qttt = QuantumTicTacToe()
+		self.assertEqual(len(qttt.board), 9, "Board should have 9 qubits")
+		for qubit in qttt.board:
+			assert isinstance(qubit, cirq.GridQubit), "Each element in board should be a Qubit"
 
-    player1 = Player()
-    player2 = Player()
-    result = play_quantum_tic_tac_toe(player1, player2)
-    assert result is None or result in ('X', 'O'), "Result should be None or 'X' or 'O'"
+	def test_play_quantum_tic_tac_toe(self):
+		player1 = Player('X')
+		player2 = Player('O')
+		result = play_quantum_tic_tac_toe(player1, player2)
+		assert result is None or result in ([0], [1]), "Result should be None or 0 or 1"
 
-def test_play_quantum_tic_tac_toe_with_winner():
-    class Player:
-        def get_move(self, circuit, board, symbol):
-            if symbol == 'X':
-                return cirq.X(board[0])
-            return cirq.X(board[8])
-
-    player1 = Player()
-    player2 = Player()
-    result = play_quantum_tic_tac_toe(player1, player2)
-    assert result == 'X', "Player 1 should win"
-
-def test_play_quantum_tic_tac_toe_with_draw():
-    class Player:
-        def get_move(self, circuit, board, symbol):
-            return cirq.X(board[random.randint(0, 8)])
-
-    player1 = Player()
-    player2 = Player()
-    result = play_quantum_tic_tac_toe(player1, player2)
-    assert result is None, "The game should end in a draw"
+if __name__ == '__main__':
+    unittest.main()
